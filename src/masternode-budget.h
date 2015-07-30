@@ -131,6 +131,7 @@ public:
 
     void CheckOrphanVotes();
     void Clear(){
+        LogPrintf(" -- %\n", __func__);
         LOCK(cs);
 
         LogPrintf("Budget object cleared\n");
@@ -227,6 +228,7 @@ public:
     bool IsTransactionValid(const CTransaction& txNew, int nBlockHeight);
     bool GetBudgetPaymentByBlock(int64_t nBlockHeight, CTxBudgetPayment& payment)
     {
+        LogPrintf(" -- %\n", __func__);
         LOCK(cs);
 
         int i = nBlockHeight - GetBlockStart();
@@ -237,6 +239,7 @@ public:
     }
     bool GetPayeeAndAmount(int64_t nBlockHeight, CScript& payee, CAmount& nAmount)
     {
+        LogPrintf(" -- %\n", __func__);
         LOCK(cs);
 
         int i = nBlockHeight - GetBlockStart();

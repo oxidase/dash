@@ -100,6 +100,8 @@ public:
     }
 
     void AddPayee(CScript payeeIn, int nIncrement){
+        LogPrintf(" -- %\n", __func__);
+        
         LOCK(cs_vecPayments);
 
         BOOST_FOREACH(CMasternodePayee& payee, vecPayments){
@@ -115,6 +117,8 @@ public:
 
     bool GetPayee(CScript& payee)
     {
+        LogPrintf(" -- %\n", __func__);
+        
         LOCK(cs_vecPayments);
 
         int nVotes = -1;
@@ -130,6 +134,8 @@ public:
 
     bool HasPayeeWithVotes(CScript payee, int nVotesReq)
     {
+        LogPrintf(" -- %\n", __func__);
+        
         LOCK(cs_vecPayments);
 
         BOOST_FOREACH(CMasternodePayee& p, vecPayments){
@@ -252,6 +258,8 @@ public:
     bool IsScheduled(CMasternode& mn, int nNotBlockHeight);
 
     bool CanVote(COutPoint outMasternode, int nBlockHeight) {
+        LogPrintf(" -- %\n", __func__);
+        
         LOCK(cs_mapMasternodePayeeVotes);
 
         if(mapMasternodesLastVote.count(outMasternode.hash + outMasternode.n)) {

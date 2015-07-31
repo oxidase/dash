@@ -100,7 +100,7 @@ public:
     }
 
     void AddPayee(CScript payeeIn, int nIncrement){
-        LogPrintf(" -- %\n", __func__);
+        LogPrintf(" - % -> ", __func__);
         
         LOCK(cs_vecPayments);
 
@@ -117,7 +117,7 @@ public:
 
     bool GetPayee(CScript& payee)
     {
-        LogPrintf(" -- %\n", __func__);
+        LogPrintf(" - % -> ", __func__);
         
         LOCK(cs_vecPayments);
 
@@ -134,7 +134,7 @@ public:
 
     bool HasPayeeWithVotes(CScript payee, int nVotesReq)
     {
-        LogPrintf(" -- %\n", __func__);
+        LogPrintf(" - % -> ", __func__);
         
         LOCK(cs_vecPayments);
 
@@ -258,7 +258,7 @@ public:
     bool IsScheduled(CMasternode& mn, int nNotBlockHeight);
 
     bool CanVote(COutPoint outMasternode, int nBlockHeight) {
-        LogPrintf(" -- %\n", __func__);
+        LogPrintf(" - % -> ", __func__);
         
         LOCK(cs_mapMasternodePayeeVotes);
 

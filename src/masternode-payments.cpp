@@ -438,7 +438,7 @@ bool CMasternodePayments::GetBlockPayee(int nBlockHeight, CScript& payee)
 // -- Only look ahead up to 8 blocks to allow for propagation of the latest 2 winners
 bool CMasternodePayments::IsScheduled(CMasternode& mn, int nNotBlockHeight)
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_mapMasternodeBlocks);
 
     CBlockIndex* pindexPrev = chainActive.Tip();
@@ -493,7 +493,7 @@ bool CMasternodePayments::AddWinningMasternode(CMasternodePaymentWinner& winnerI
 
 bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_vecPayments);
 
     int nMaxSignatures = 0;
@@ -541,7 +541,7 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
 
 std::string CMasternodeBlockPayees::GetRequiredPaymentsString()
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_vecPayments);
 
     std::string ret = "Unknown";
@@ -564,7 +564,7 @@ std::string CMasternodeBlockPayees::GetRequiredPaymentsString()
 
 std::string CMasternodePayments::GetRequiredPaymentsString(int nBlockHeight)
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_mapMasternodeBlocks);
 
     if(mapMasternodeBlocks.count(nBlockHeight)){
@@ -576,7 +576,7 @@ std::string CMasternodePayments::GetRequiredPaymentsString(int nBlockHeight)
 
 bool CMasternodePayments::IsTransactionValid(const CTransaction& txNew, int nBlockHeight)
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_mapMasternodeBlocks);
 
     if(mapMasternodeBlocks.count(nBlockHeight)){
@@ -588,7 +588,7 @@ bool CMasternodePayments::IsTransactionValid(const CTransaction& txNew, int nBlo
 
 void CMasternodePayments::CleanPaymentList()
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_mapMasternodePayeeVotes);
 
     if(chainActive.Tip() == NULL) return;
@@ -762,7 +762,7 @@ bool CMasternodePaymentWinner::SignatureValid()
 
 void CMasternodePayments::Sync(CNode* node, int nCountNeeded)
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_mapMasternodePayeeVotes);
 
     if(chainActive.Tip() == NULL) return;
@@ -798,7 +798,7 @@ std::string CMasternodePayments::ToString() const
 
 int CMasternodePayments::GetOldestBlock()
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_mapMasternodeBlocks);
 
     int nOldestBlock = std::numeric_limits<int>::max();
@@ -818,7 +818,7 @@ int CMasternodePayments::GetOldestBlock()
 
 int CMasternodePayments::GetNewestBlock()
 {
-    LogPrintf(" -- %\n", __func__);
+    LogPrintf(" - % -> ", __func__);
     LOCK(cs_mapMasternodeBlocks);
 
     int nNewestBlock = 0;

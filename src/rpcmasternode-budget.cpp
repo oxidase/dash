@@ -174,7 +174,8 @@ Value mnbudget(const Array& params, bool fHelp)
         CBudgetProposalBroadcast budgetProposalBroadcast(strProposalName, strURL, nPaymentCount, scriptPubKey, nAmount, nBlockStart, hash);
 
         std::string strError = "";
-        if(!IsBudgetCollateralValid(hash, budgetProposalBroadcast.GetHash(), strError, budgetProposalBroadcast.nTime)){
+        int nConf = 0;
+        if(!IsBudgetCollateralValid(hash, budgetProposalBroadcast.GetHash(), strError, budgetProposalBroadcast.nTime, nConf)){
             return "Proposal FeeTX is not valid - " + hash.ToString() + " - " + strError;
         }
 

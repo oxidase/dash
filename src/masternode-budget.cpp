@@ -807,51 +807,47 @@ void CBudgetManager::NewBlock()
     std::vector<CBudgetProposalBroadcast>::iterator it4 = vecImmatureBudgetProposals.begin();
     while(it4 != vecImmatureBudgetProposals.end())
     {
-        CBudgetProposalBroadcast& prop = (*it4);
-
         std::string strError = "";
         int nConf = 0;
-        if(!IsBudgetCollateralValid(prop.nFeeTXHash, prop.GetHash(), strError, prop.nTime, nConf)){
+        if(!IsBudgetCollateralValid((*it4).nFeeTXHash, (*it4).GetHash(), strError, (*it4).nTime, nConf)){
             ++it4;
             continue;
         }
 
-        if(!prop.IsValid(strError)) {
+        if(!(*it4).IsValid(strError)) {
             LogPrintf("mprop (immature) - invalid budget proposal - %s\n", strError);
             vecImmatureBudgetProposals.erase(it4++); 
             continue;
         }
 
-        CBudgetProposal budgetProposal(prop);
-        if(AddProposal(budgetProposal)) {prop.Relay();}
+        CBudgetProposal budgetProposal((*it4));
+        if(AddProposal(budgetProposal)) {(*it4).Relay();}
 
-        LogPrintf("mprop (immature) - new budget - %s\n", prop.GetHash().ToString());
+        LogPrintf("mprop (immature) - new budget - %s\n", (*it4).GetHash().ToString());
         vecImmatureBudgetProposals.erase(it4++); 
     }
 
     std::vector<CFinalizedBudgetBroadcast>::iterator it5 = vecImmatureFinalizedBudgets.begin();
     while(it5 != vecImmatureFinalizedBudgets.end())
     {
-        CFinalizedBudgetBroadcast& budget = (*it5);
-
         std::string strError = "";
         int nConf = 0;
-        if(!IsBudgetCollateralValid(budget.nFeeTXHash, budget.GetHash(), strError, budget.nTime, nConf)){
+        if(!IsBudgetCollateralValid((*it5).nFeeTXHash, (*it5).GetHash(), strError, (*it5).nTime, nConf)){
             ++it5;
             continue;
         }
 
-        if(!budget.IsValid(strError)) {
+        if(!(*it5).IsValid(strError)) {
             LogPrintf("fbs (immature) - invalid finalized budget - %s\n", strError);
             vecImmatureFinalizedBudgets.erase(it5++); 
             continue;
         }
 
-        LogPrintf("fbs (immature) - new finalized budget - %s\n", budget.GetHash().ToString());
+        LogPrintf("fbs (immature) - new finalized budget - %s\n", (*it5).GetHash().ToString());
 
-        CFinalizedBudget finalizedBudget(budget);
-        if(AddFinalizedBudget(finalizedBudget)) {budget.Relay();}
-        masternodeSync.AddedBudgetItem(budget.GetHash());
+        CFinalizedBudget finalizedBudget((*it5));
+        if(AddFinalizedBudget(finalizedBudget)) {(*it5).Relay();}
+        masternodeSync.AddedBudgetItem((*it5).GetHash());
 
         vecImmatureFinalizedBudgets.erase(it5++); 
     }
@@ -1393,6 +1389,18 @@ CBudgetProposalBroadcast::CBudgetProposalBroadcast()
 }
 
 CBudgetProposalBroadcast::CBudgetProposalBroadcast(const CBudgetProposal& other)
+{
+    strProposalName = other.strProposalName;
+    strURL = other.strURL;
+    nBlockStart = other.nBlockStart;
+    nBlockEnd = other.nBlockEnd;
+    address = other.address;
+    nAmount = other.nAmount;
+    nFeeTXHash = other.nFeeTXHash;
+    nTime = other.nTime;
+}
+
+CBudgetProposalBroadcast::CBudgetProposalBroadcast(const CBudgetProposalBroadcast& other)
 {
     strProposalName = other.strProposalName;
     strURL = other.strURL;

@@ -296,6 +296,27 @@ public:
     CFinalizedBudgetBroadcast(const CFinalizedBudget& other);
     CFinalizedBudgetBroadcast(std::string strBudgetNameIn, int nBlockStartIn, std::vector<CTxBudgetPayment> vecBudgetPaymentsIn, uint256 nFeeTXHashIn);
 
+    void swap(CFinalizedBudgetBroadcast& first, CFinalizedBudgetBroadcast& second) // nothrow
+    {
+        // enable ADL (not necessary in our case, but good practice)
+        using std::swap;
+
+        // by swapping the members of two classes,
+        // the two classes are effectively swapped
+        swap(first.strBudgetName, second.strBudgetName);
+        swap(first.nBlockStart, second.nBlockStart);
+        //swap(first.vecBudgetPayments, second.vecBudgetPayments);
+        //swap(first.mapVotes, second.mapVotes);
+        swap(first.nFeeTXHash, second.nFeeTXHash);
+        swap(first.nTime, second.nTime);
+    }
+
+    CFinalizedBudgetBroadcast& operator=(CFinalizedBudgetBroadcast from)
+    {
+        swap(*this, from);
+        return *this;
+    }
+
     void Relay();
 
     ADD_SERIALIZE_METHODS;
@@ -462,7 +483,32 @@ private:
 public:
     CBudgetProposalBroadcast();
     CBudgetProposalBroadcast(const CBudgetProposal& other);
+    CBudgetProposalBroadcast(const CBudgetProposalBroadcast& other);
     CBudgetProposalBroadcast(std::string strProposalNameIn, std::string strURLIn, int nPaymentCount, CScript addressIn, CAmount nAmountIn, int nBlockStartIn, uint256 nFeeTXHashIn);
+
+    void swap(CBudgetProposalBroadcast& first, CBudgetProposalBroadcast& second) // nothrow
+    {
+        // enable ADL (not necessary in our case, but good practice)
+        using std::swap;
+
+        // by swapping the members of two classes,
+        // the two classes are effectively swapped
+        swap(first.strProposalName, second.strProposalName);
+        swap(first.nBlockStart, second.nBlockStart);
+        swap(first.strURL, second.strURL);
+        swap(first.nBlockEnd, second.nBlockEnd);
+        swap(first.nAmount, second.nAmount);
+        swap(first.address, second.address);
+        swap(first.nTime, second.nTime);
+        swap(first.nFeeTXHash, second.nFeeTXHash);
+        //swap(first.mapVotes, second.mapVotes);
+    }
+
+    CBudgetProposalBroadcast& operator=(CBudgetProposalBroadcast from)
+    {
+        swap(*this, from);
+        return *this;
+    }
 
     void Relay();
 

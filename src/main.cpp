@@ -2343,6 +2343,8 @@ static int64_t nTimePostConnect = 0;
  * corresponding to pindexNew, to bypass loading it again from disk.
  */
 bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *pblock) {
+    LogPrintf("ConnectTip - 1\n");
+
     assert(pindexNew->pprev == chainActive.Tip());
     mempool.check(pcoinsTip);
     // Read block from disk.
@@ -2549,11 +2551,17 @@ static bool ActivateBestChainStep(CValidationState &state, CBlockIndex *pindexMo
     const CBlockIndex *pindexOldTip = chainActive.Tip();
     const CBlockIndex *pindexFork = chainActive.FindFork(pindexMostWork);
 
+    LogPrintf("ActivateBestChainStep - 1\n");
+
     // Disconnect active blocks which are no longer in the best chain.
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
-        if (!DisconnectTip(state))
+        LogPrintf("ActivateBestChainStep - 2\n");
+
+        if (!DisconnectTip(state)) 
             return false;
     }
+
+    LogPrintf("ActivateBestChainStep - 3\n");
 
     // Build list of new blocks to connect.
     std::vector<CBlockIndex*> vpindexToConnect;
@@ -2574,6 +2582,7 @@ static bool ActivateBestChainStep(CValidationState &state, CBlockIndex *pindexMo
 
     // Connect new blocks.
     BOOST_REVERSE_FOREACH(CBlockIndex *pindexConnect, vpindexToConnect) {
+
         if (!ConnectTip(state, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL)) {
             if (state.IsInvalid()) {
                 // The block violates a consensus rule.
@@ -2584,6 +2593,7 @@ static bool ActivateBestChainStep(CValidationState &state, CBlockIndex *pindexMo
                 fContinue = false;
                 break;
             } else {
+                LogPrintf("ActivateBestChainStep - 4\n");
                 // A system error occurred (disk space, database error, ...).
                 return false;
             }
@@ -2604,6 +2614,8 @@ static bool ActivateBestChainStep(CValidationState &state, CBlockIndex *pindexMo
     else
         CheckForkWarningConditions();
 
+    LogPrintf("ActivateBestChainStep - 5\n");
+
     return true;
 }
 
@@ -2615,6 +2627,9 @@ static bool ActivateBestChainStep(CValidationState &state, CBlockIndex *pindexMo
 bool ActivateBestChain(CValidationState &state, CBlock *pblock) {
     CBlockIndex *pindexNewTip = NULL;
     CBlockIndex *pindexMostWork = NULL;
+
+    LogPrintf("ActivateBestChain - 1\n");
+
     do {
         boost::this_thread::interruption_point();
 
@@ -2626,11 +2641,15 @@ bool ActivateBestChain(CValidationState &state, CBlock *pblock) {
             pindexMostWork = FindMostWorkChain();
 
             // Whether we have anything to do at all.
-            if (pindexMostWork == NULL || pindexMostWork == chainActive.Tip())
+            if (pindexMostWork == NULL || pindexMostWork == chainActive.Tip()){
+                LogPrintf("ActivateBestChain - 2\n");
                 return true;
+            }
 
-            if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL))
+            if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL)) {
+                LogPrintf("ActivateBestChain - 3\n");
                 return false;
+            }
 
             pindexNewTip = chainActive.Tip();
             fInitialDownload = IsInitialBlockDownload();
@@ -2657,8 +2676,11 @@ bool ActivateBestChain(CValidationState &state, CBlock *pblock) {
 
     // Write changes periodically to disk, after relay.
     if (!FlushStateToDisk(state, FLUSH_STATE_PERIODIC)) {
+        LogPrintf("ActivateBestChain - 2\n");
         return false;
     }
+
+    LogPrintf("ActivateBestChain - 3\n");
 
     return true;
 }
@@ -3161,10 +3183,13 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
 
     CBlockIndex *&pindex = *ppindex;
 
+    LogPrintf("AcceptBlock - 1\n");
+
     if (!AcceptBlockHeader(block, state, &pindex))
         return false;
 
     if (pindex->nStatus & BLOCK_HAVE_DATA) {
+        LogPrintf("AcceptBlock - 2\n");
         // TODO: deal better with duplicate blocks.
         // return state.DoS(20, error("AcceptBlock() : already have block %d %s", pindex->nHeight, pindex->GetBlockHash().ToString()), REJECT_DUPLICATE, "duplicate");
         return true;
@@ -3175,6 +3200,8 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
             pindex->nStatus |= BLOCK_FAILED_VALID;
             setDirtyBlockIndex.insert(pindex);
         }
+
+        LogPrintf("AcceptBlock - 3\n");
         return false;
     }
 
@@ -3196,6 +3223,8 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
     } catch(std::runtime_error &e) {
         return state.Abort(std::string("System error: ") + e.what());
     }
+
+    LogPrintf("AcceptBlock - 4\n");
 
     return true;
 }
@@ -3271,17 +3300,22 @@ bool ProcessNewBlock(CValidationState &state, CNode* pfrom, CBlock* pblock, CDis
         TRY_LOCK(cs_main, lockMain);
         if(!lockMain) { MilliSleep(50); continue; }
 
+        LogPrintf("ProcessNewBlock - 1\n");
         MarkBlockAsReceived(pblock->GetHash());
         if (!checked) {
             return error("%s : CheckBlock FAILED", __func__);
         }
 
+
+        LogPrintf("ProcessNewBlock - 2\n");
         // Store to disk
         CBlockIndex *pindex = NULL;
         bool ret = AcceptBlock(*pblock, state, &pindex, dbp);
         if (pindex && pfrom) {
             mapBlockSource[pindex->GetBlockHash()] = pfrom->GetId();
         }
+
+        LogPrintf("ProcessNewBlock - 3\n");
         CheckBlockIndex();
         if (!ret)
             return error("%s : AcceptBlock FAILED", __func__);
